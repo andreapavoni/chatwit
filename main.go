@@ -8,11 +8,20 @@ import (
 	"text/template"
 )
 
+// flags
 var addr = flag.String("addr", "localhost:8080", "http service address")
-var homeTempl = template.Must(template.ParseFiles("home.html"))
 
-func homeHandler(c http.ResponseWriter, req *http.Request) {
-	homeTempl.Execute(c, req.Host)
+// templates
+var chatTempl = template.Must(template.ParseFiles("chat.html"))
+var indexTempl = template.Must(template.ParseFiles("index.html"))
+
+// handlers
+func chatHandler(c http.ResponseWriter, req *http.Request) {
+	chatTempl.Execute(c, req.Host)
+}
+
+func indexHandler(c http.ResponseWriter, req *http.Request) {
+	indexTempl.Execute(c, req.Host)
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -28,7 +37,8 @@ func main() {
 
 	go h.run()
 
-  http.HandleFunc("/", homeHandler)
+  http.HandleFunc("/", indexHandler)
+  http.HandleFunc("/chat", chatHandler)
   http.Handle("/ws", websocket.Handler(wsHandler))
 
   if err := http.ListenAndServe(*addr, nil); err != nil {
