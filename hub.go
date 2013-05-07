@@ -14,13 +14,6 @@ type hub struct {
 	unregister chan *connection
 }
 
-var h = hub{
-	broadcast:   make(chan string),
-	register:    make(chan *connection),
-	unregister:  make(chan *connection),
-	connections: make(map[*connection]bool),
-}
-
 func (h *hub) run() {
 	for {
 		select {
