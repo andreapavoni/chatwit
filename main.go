@@ -17,6 +17,24 @@ var indexTempl = template.Must(template.ParseFiles("index.html"))
 
 // handlers
 func chatHandler(c http.ResponseWriter, req *http.Request) {
+
+  if req.Method == "POST" {
+    var nick string
+
+    if nick = req.FormValue("nickname"); nick != "" {
+      http.SetCookie(c, &http.Cookie{Name: "user", Value: nick})
+    } else {
+      nick = randNickname()
+    }
+
+    http.SetCookie(c, &http.Cookie{Name: "user", Value: nick})
+
+  } else { // it's a GET
+    if _, err := req.Cookie("user"); err != nil {
+      http.Redirect(c, req, "/", 403)
+    }
+  }
+
 	chatTempl.Execute(c, req.Host)
 }
 
@@ -25,7 +43,10 @@ func indexHandler(c http.ResponseWriter, req *http.Request) {
 }
 
 func wsHandler(ws *websocket.Conn) {
-  c := &connection{send: make(chan string, 256), ws: ws, user: randInt()}
+  cookie, _ := ws.Request().Cookie("user")
+  nick := cookie.Value
+
+  c := &connection{send: make(chan string, 256), ws: ws, user: nick}
 	h.register <- c
 	defer func() { h.unregister <- c }()
 	go c.writer()
@@ -39,9 +60,18 @@ func main() {
 
   http.HandleFunc("/", indexHandler)
   http.HandleFunc("/chat", chatHandler)
-  http.Handle("/ws", websocket.Handler(wsHandler))
+  http.Handle("/ws", websocket.Handler(wsHandler)) //GET
 
   if err := http.ListenAndServe(*addr, nil); err != nil {
     log.Fatal("ListenAndServe:", err)
   }
 }
+
+
+/*
+
+func (s *Server) Websocket(route string, httpHandler websocket.Handler) {
+  s.addRoute(route, "GET", httpHandler)
+}
+
+*/

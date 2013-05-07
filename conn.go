@@ -14,7 +14,7 @@ type connection struct {
 	// Buffered channel of outbound messages.
 	send chan string
 
-  user int
+  user string
 }
 
 func (c *connection) reader() {
@@ -25,7 +25,7 @@ func (c *connection) reader() {
 			break
 		}
 
-    msg := fmt.Sprintf("%d -> %s", c.user, message)
+    msg := fmt.Sprintf("%s -> %s", c.user, message)
 
 		h.broadcast <- msg
 	}
@@ -44,7 +44,7 @@ func (c *connection) writer() {
 	c.ws.Close()
 }
 
-func randInt() int {
+func randNickname() string {
 	seed := time.Now().UTC().UnixNano()
 	rand.Seed(seed)
 
@@ -53,5 +53,5 @@ func randInt() int {
 		val = -val
 	}
 
-	return (1 + rand.Intn(val))
+	return fmt.Sprintf("anonymous-%d", (1 + rand.Intn(val)))
 }
