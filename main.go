@@ -6,6 +6,9 @@ import (
   "log"
   "net/http"
   "text/template"
+  "fmt"
+  "math/rand"
+  "time"
 )
 
 var (
@@ -17,13 +20,20 @@ var (
   indexTempl = template.Must(template.ParseFiles("index.html"))
 
   // hub
-  h = hub {
-    broadcast:   make(chan string),
-    register:    make(chan *connection),
-    unregister:  make(chan *connection),
-    connections: make(map[*connection]bool),
-  }
+  h = newHub()
 )
+
+func randNickname() string {
+  seed := time.Now().UTC().UnixNano()
+  rand.Seed(seed)
+
+  val := int(seed)
+  if val < 0 {
+    val = -val
+  }
+
+  return fmt.Sprintf("anonymous-%d", (1 + rand.Intn(val)))
+}
 
 // handlers
 func chatHandler(c http.ResponseWriter, req *http.Request) {
@@ -54,12 +64,8 @@ func indexHandler(c http.ResponseWriter, req *http.Request) {
 func wsHandler(ws *websocket.Conn) {
   cookie, _ := ws.Request().Cookie("user")
   nick := cookie.Value
-
-  c := &connection{send: make(chan string, 256), ws: ws, user: nick}
-  h.register <- c
-  defer func() { h.unregister <- c }()
-  go c.writer()
-  c.reader()
+  c := h.registerConnection(nick, ws)
+  c.run()
 }
 
 func main() {

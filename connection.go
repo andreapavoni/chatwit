@@ -2,57 +2,54 @@ package main
 
 import (
   "code.google.com/p/go.net/websocket"
-  "fmt"
-  "math/rand"
-  "time"
 )
 
 type connection struct {
+  // The hub it belongs to
+  hub *hub
   // The websocket connection.
   ws *websocket.Conn
-
   // Buffered channel of outbound messages.
   send chan string
-
   user string
 }
 
+func newConnection(hub *hub, ws *websocket.Conn, user string) *connection {
+  return &connection {
+    hub: hub,
+    ws: ws,
+    send: make(chan string, 256),
+    user: user,
+  }
+}
+
+func (c *connection) run() {
+  go c.writer()
+  c.reader()
+}
+
+func (c *connection) closeWs() {
+  go c.ws.Close()
+}
+
 func (c *connection) reader() {
+  defer func() { c.hub.unregisterConnection(c) }()
   for {
     var message string
-
     if err := websocket.Message.Receive(c.ws, &message); err != nil {
       break
     }
-
-    msg := fmt.Sprintf("%s -> %s", c.user, message)
-
-    h.broadcast <- msg
+    c.hub.broadcastMessage(c.user, message)
   }
-
-  c.ws.Close()
+  c.closeWs()
 }
 
 func (c *connection) writer() {
   for message := range c.send {
-
     if err := websocket.Message.Send(c.ws, message); err != nil {
       break
     }
   }
-
-  c.ws.Close()
-}
-
-func randNickname() string {
-  seed := time.Now().UTC().UnixNano()
-  rand.Seed(seed)
-
-  val := int(seed)
-  if val < 0 {
-    val = -val
-  }
-
-  return fmt.Sprintf("anonymous-%d", (1 + rand.Intn(val)))
+  c.closeWs()
 }
 
