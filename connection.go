@@ -33,7 +33,6 @@ func (c *connection) closeWs() {
 }
 
 func (c *connection) reader() {
-  defer func() { c.hub.unregisterConnection(c) }()
   for {
     var message string
     if err := websocket.Message.Receive(c.ws, &message); err != nil {

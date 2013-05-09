@@ -71,8 +71,7 @@ func (s *server) run() {
   http.Handle("/ws", websocket.Handler(func (ws *websocket.Conn) {
     cookie, _ := ws.Request().Cookie("user")
     nick := cookie.Value
-    c := s.hub.registerConnection(nick, ws)
-    c.run()
+    s.hub.registerConnection(nick, ws)
   }))
 
   if err := http.ListenAndServe(s.addr, nil); err != nil {

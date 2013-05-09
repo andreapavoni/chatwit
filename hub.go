@@ -52,14 +52,11 @@ func (h *hub) removeConnection(c *connection) {
   close(c.send)
 }
 
-func (h *hub) registerConnection(nick string, ws *websocket.Conn) *connection {
+func (h *hub) registerConnection(nick string, ws *websocket.Conn) {
   c := newConnection(h, ws, nick)
   h.register <- c
-  return c
-}
-
-func (h *hub) unregisterConnection(c *connection) {
-  h.unregister <- c
+  defer func() { h.unregister <- c }()
+  c.run()
 }
 
 func (h *hub) broadcastMessage(user string, message string) {
