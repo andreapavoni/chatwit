@@ -71,7 +71,7 @@ func wsHandler(ws *websocket.Conn) {
 func main() {
   flag.Parse()
 
-  go h.run()
+  h.run()
 
   http.HandleFunc("/", indexHandler)
   http.HandleFunc("/chat", chatHandler)

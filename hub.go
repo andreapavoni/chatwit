@@ -8,13 +8,10 @@ import (
 type hub struct {
   // Registered connections.
   connections map[*connection]bool
-
   // Inbound messages from the connections.
   broadcast chan string
-
   // Register requests from the connections.
   register chan *connection
-
   // Unregister requests from connections.
   unregister chan *connection
 }
@@ -29,23 +26,25 @@ func newHub() *hub {
 }
 
 func (h *hub) run() {
-  for {
-    select {
-    case c := <-h.register:
-      h.connections[c] = true
-    case c := <-h.unregister:
-      h.removeConnection(c)
-    case m := <-h.broadcast:
-      for c := range h.connections {
-        select {
-        case c.send <- m:
-        default:
-          h.removeConnection(c)
-          c.closeWs()
+  go func () {
+    for {
+      select {
+      case c := <-h.register:
+        h.connections[c] = true
+      case c := <-h.unregister:
+        h.removeConnection(c)
+      case m := <-h.broadcast:
+        for c := range h.connections {
+          select {
+          case c.send <- m:
+          default:
+            h.removeConnection(c)
+            c.closeWs()
+          }
         }
       }
     }
-  }
+  }()
 }
 
 func (h *hub) removeConnection(c *connection) {
