@@ -46,7 +46,6 @@ func notFound(c http.ResponseWriter, req *http.Request) {
   http.Redirect(c, req, "/", 302)
 }
 
-
 func main() {
 	flag.Parse()
   addr := flag.String("addr", "localhost:8080", "http service address")
@@ -59,8 +58,8 @@ func main() {
   router.HandleFunc("/chat/{id:[A-Za-z0-9]+}", chatHandler).Methods("GET")
   router.HandleFunc("/chat", startChatHandler).Methods("POST")
   router.Handle("/ws/{id:[A-Za-z0-9]+}", websocket.Handler(wsHandler))
+  router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
   router.NotFoundHandler = http.HandlerFunc(notFound)
-
 
   http.Handle("/", router)
 
