@@ -31,7 +31,7 @@
         });
 
         if (window["WebSocket"]) {
-          conn = new WebSocket("ws://{{$}}/ws");
+          conn = new WebSocket("ws://{{$.Host}}/ws/{{$.RoomId}}");
           conn.onclose = function(evt) {
             appendLog($("<div><b>Connection closed.</b></div>"))
           }

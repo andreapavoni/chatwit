@@ -1,66 +1,64 @@
 package main
 
-import (
-  "fmt"
-  "code.google.com/p/go.net/websocket"
-)
+type Hub struct {
+	// Registered rooms.
+	rooms map[string]*Room
 
-type hub struct {
-  // Registered connections.
-  connections map[*connection]bool
-  // Inbound messages from the connections.
-  broadcast chan string
-  // Register requests from the connections.
-  register chan *connection
-  // Unregister requests from connections.
-  unregister chan *connection
+	// Inbound messages from the connections.
+	broadcast chan *Message
+
+	// Register requests from the connections.
+	register chan *Connection
+
+	// Unregister requests from connections.
+	unregister chan *Connection
 }
 
-func newHub() *hub {
-  return &hub {
-    broadcast: make(chan string),
-    register: make(chan *connection),
-    unregister: make(chan *connection),
-    connections: make(map[*connection]bool),
-  }
+func newHub() *Hub {
+	return &Hub{
+		broadcast:   make(chan *Message),
+		register:    make(chan *Connection),
+		unregister:  make(chan *Connection),
+		rooms:       make(map[string]*Room),
+	}
 }
 
-func (h *hub) run() {
-  go func () {
-    for {
-      select {
-      case c := <-h.register:
-        h.connections[c] = true
-      case c := <-h.unregister:
-        h.removeConnection(c)
-      case m := <-h.broadcast:
-        for c := range h.connections {
-          select {
-          case c.send <- m:
-          default:
-            h.removeConnection(c)
-            c.closeWs()
-          }
-        }
-      }
-    }
-  }()
+func (h *Hub) run() {
+	go func() {
+		for {
+			select {
+			case c := <-h.register:
+				h.joinRoom(c)
+
+			case c := <-h.unregister:
+				h.leaveRoom(c)
+
+			case m := <-h.broadcast:
+				for c := range h.rooms[m.connection.room].connections {
+					select {
+					case c.send <- m.Text:
+					default:
+            h.leaveRoom(c)
+						go c.ws.Close()
+					}
+				}
+			}
+		}
+	}()
 }
 
-func (h *hub) removeConnection(c *connection) {
-  delete(h.connections, c)
-  close(c.send)
+func (h *Hub) joinRoom(c *Connection) {
+	var room *Room
+
+	if room = hub.rooms[c.room]; room == nil {
+		room = &Room{Name: c.room, connections: make(map[*Connection]bool)}
+	}
+
+	room.connections[c] = true
+	hub.rooms[c.room] = room
 }
 
-func (h *hub) registerConnection(nick string, ws *websocket.Conn) {
-  c := newConnection(h, ws, nick)
-  h.register <- c
-  defer func() { h.unregister <- c }()
-  c.run()
+func (h *Hub) leaveRoom(c *Connection) {
+	delete(hub.rooms, c.room)
+	close(c.send)
 }
-
-func (h *hub) broadcastMessage(user string, message string) {
-  msg := fmt.Sprintf("%s -> %s", user, message)
-  h.broadcast <- msg
-}
-
