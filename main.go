@@ -1,11 +1,11 @@
 package main
 
 import (
-	"code.google.com/p/go.net/websocket"
-	"flag"
-	"log"
-	"net/http"
-	"text/template"
+  "code.google.com/p/go.net/websocket"
+  "flag"
+  "log"
+  "net/http"
+  "text/template"
   "github.com/gorilla/mux"
 )
 
@@ -19,7 +19,7 @@ type chatData struct {
 }
 
 func homeHandler(c http.ResponseWriter, req *http.Request) {
-	indexTemplate.Execute(c, req.Host)
+  indexTemplate.Execute(c, req.Host)
 }
 
 func chatHandler(c http.ResponseWriter, req *http.Request) {
@@ -47,7 +47,7 @@ func notFound(c http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	flag.Parse()
+  flag.Parse()
   addr := flag.String("addr", "localhost:8080", "http service address")
 
   hub.run()
@@ -64,6 +64,7 @@ func main() {
   http.Handle("/", router)
 
   if err := http.ListenAndServe(*addr, nil); err != nil {
-		log.Fatal("ListenAndServe:", err)
-	}
+    log.Fatal("ListenAndServe:", err)
+  }
 }
+
