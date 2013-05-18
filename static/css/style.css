@@ -25,10 +25,10 @@ body {
 
 #form {
   padding: 0 0.5em 0 0.5em;
-  margin: 0 auto;
+  margin: 0;
   position: absolute;
-  top: 1em;
+  bottom: 1em;
+  left: 0px;
   width: 100%;
   overflow: hidden;
 }
-
