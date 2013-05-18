@@ -7,10 +7,14 @@ import (
   "net/http"
   "text/template"
   "github.com/gorilla/mux"
+  "github.com/gorilla/sessions"
+  "github.com/alloy-d/goauth"
+  "fmt"
 )
 
 var indexTemplate = template.Must(template.ParseFiles("views/index.html"))
 var chatTemplate = template.Must(template.ParseFiles("views/chat.html"))
+var store = sessions.NewCookieStore([]byte("foobarquxsecret"))
 var hub = newHub()
 
 type chatData struct {
@@ -23,7 +27,9 @@ func homeHandler(c http.ResponseWriter, req *http.Request) {
 }
 
 func chatHandler(c http.ResponseWriter, req *http.Request) {
-  if _, err := req.Cookie("user"); err != nil {
+  session, _ := store.Get(req, "session")
+
+  if session.Values["user"] == nil {
     http.Redirect(c, req, "/", 403)
   }
 
@@ -33,17 +39,66 @@ func chatHandler(c http.ResponseWriter, req *http.Request) {
   chatTemplate.Execute(c, &chatData{Host: req.Host, RoomId: roomId})
 }
 
-func startChatHandler(c http.ResponseWriter, req *http.Request) {
-  if nickname := req.FormValue("nickname"); nickname != "" {
-    http.SetCookie(c, &http.Cookie{Name: "user", Value: nickname})
-    http.Redirect(c, req, ("/chat/" + nickname), 302)
-  } else {
-    http.Redirect(c, req, "/", 403)
-  }
-}
-
 func notFound(c http.ResponseWriter, req *http.Request) {
   http.Redirect(c, req, "/", 302)
+}
+
+func newOAuth() *oauth.OAuth {
+  o := new (oauth.OAuth)
+  o.ConsumerKey = "M9MHfTfKDyF5yZM6xueTxg"
+  o.ConsumerSecret = "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo"
+  o.Callback = "http://127.0.0.1:8080/auth/twitter/callback"
+  o.RequestTokenURL = "https://api.twitter.com/oauth/request_token"
+  o.OwnerAuthURL = "https://api.twitter.com/oauth/authorize"
+  o.AccessTokenURL = "https://api.twitter.com/oauth/access_token"
+  o.SignatureMethod = "HMAC-SHA1"
+  return o
+}
+
+func twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
+  o := newOAuth()
+
+  err := o.GetRequestToken()
+  if err != nil {
+    fmt.Println(err)
+    return 
+  }
+
+  url, err := o.AuthorizationURL()
+  if err != nil { 
+    fmt.Println(err)
+    return 
+  }
+
+  session, _ := store.Get(req, "session")
+  session.Values["requestToken"] = o.RequestToken
+  session.Values["requestSecret"] = o.RequestSecret
+  session.Save(req, c)
+
+  http.Redirect(c, req, url, 302)
+}
+
+func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
+  o := newOAuth()
+
+  session, _ := store.Get(req, "session")
+  o.RequestToken = session.Values["requestToken"].(string)
+  o.RequestSecret = session.Values["requestSecret"].(string)
+
+  req.ParseForm()
+  token := req.Form.Get("oauth_verifier")
+
+  err := o.GetAccessToken(token)
+  if err != nil {
+    fmt.Println(err)
+    http.Redirect(c, req, "/", 403)
+    return
+  }
+
+  session.Values["user"] = o.UserName()
+  session.Save(req, c)
+
+  http.Redirect(c, req, ("/chat/" + o.UserName()), 302)
 }
 
 func main() {
@@ -54,9 +109,9 @@ func main() {
 
   router := mux.NewRouter()
   router.HandleFunc("/", homeHandler).Methods("GET")
-
+  router.HandleFunc("/auth/twitter", twitterAuthHandler).Methods("GET")
+  router.HandleFunc("/auth/twitter/callback", twitterAuthCallbackHandler).Methods("GET")
   router.HandleFunc("/chat/{id:[A-Za-z0-9]+}", chatHandler).Methods("GET")
-  router.HandleFunc("/chat", startChatHandler).Methods("POST")
   router.Handle("/ws/{id:[A-Za-z0-9]+}", websocket.Handler(wsHandler))
   router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
   router.NotFoundHandler = http.HandlerFunc(notFound)

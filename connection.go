@@ -63,8 +63,8 @@ func wsHandler(ws *websocket.Conn) {
 }
 
 func broadcastMessage(message *Message) {
-  cookie, _ := message.connection.ws.Request().Cookie("user")
-  nickname := cookie.Value
+  session, _ := store.Get(message.connection.ws.Request(), "session")
+  nickname := session.Values["user"].(string)
 
   msg := fmt.Sprintf("%s -> %s", nickname, message.Text)
   message.Text = msg
