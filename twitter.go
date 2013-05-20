@@ -7,7 +7,7 @@ import (
   "net/http"
 )
 
-func newTwitterOAuth(key, secret, callback string) *oauth.OAuth {
+func NewTwitterOAuth(key, secret, callback string) *oauth.OAuth {
   o := new(oauth.OAuth)
   o.ConsumerKey = key
   o.ConsumerSecret = secret
