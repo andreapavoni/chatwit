@@ -3,13 +3,13 @@ package main
 import (
   "code.google.com/p/go.net/websocket"
   "flag"
+  "fmt"
+  "github.com/alloy-d/goauth"
+  "github.com/gorilla/mux"
+  "github.com/gorilla/sessions"
   "log"
   "net/http"
   "text/template"
-  "github.com/gorilla/mux"
-  "github.com/gorilla/sessions"
-  "github.com/alloy-d/goauth"
-  "fmt"
 )
 
 var indexTemplate = template.Must(template.ParseFiles("views/index.html"))
@@ -18,7 +18,7 @@ var store = sessions.NewCookieStore([]byte("foobarquxsecret"))
 var hub = newHub()
 
 type chatData struct {
-  Host string
+  Host   string
   RoomId string
 }
 
@@ -44,9 +44,10 @@ func notFound(c http.ResponseWriter, req *http.Request) {
 }
 
 func newOAuth() *oauth.OAuth {
-  o := new (oauth.OAuth)
+  o := new(oauth.OAuth)
   o.ConsumerKey = "M9MHfTfKDyF5yZM6xueTxg"
   o.ConsumerSecret = "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo"
+
   o.Callback = "http://127.0.0.1:8080/auth/twitter/callback"
   o.RequestTokenURL = "https://api.twitter.com/oauth/request_token"
   o.OwnerAuthURL = "https://api.twitter.com/oauth/authorize"
@@ -61,13 +62,13 @@ func twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
   err := o.GetRequestToken()
   if err != nil {
     fmt.Println(err)
-    return 
+    return
   }
 
   url, err := o.AuthorizationURL()
-  if err != nil { 
+  if err != nil {
     fmt.Println(err)
-    return 
+    return
   }
 
   session, _ := store.Get(req, "session")
@@ -89,6 +90,7 @@ func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
   token := req.Form.Get("oauth_verifier")
 
   err := o.GetAccessToken(token)
+
   if err != nil {
     fmt.Println(err)
     http.Redirect(c, req, "/", 403)
@@ -103,7 +105,7 @@ func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
 
 func main() {
   flag.Parse()
-  addr := flag.String("addr", "localhost:8080", "http service address")
+  addr := flag.String("addr", "127.0.0.1:8080", "http service address")
 
   hub.run()
 
@@ -122,4 +124,3 @@ func main() {
     log.Fatal("ListenAndServe:", err)
   }
 }
-
