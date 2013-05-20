@@ -7,12 +7,11 @@ import (
   "net/http"
 )
 
-func newOAuth() *oauth.OAuth {
+func newTwitterOAuth(key, secret, callback string) *oauth.OAuth {
   o := new(oauth.OAuth)
-  o.ConsumerKey = "M9MHfTfKDyF5yZM6xueTxg"
-  o.ConsumerSecret = "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo"
-
-  o.Callback = "http://127.0.0.1:8080/auth/twitter/callback"
+  o.ConsumerKey = key
+  o.ConsumerSecret = secret
+  o.Callback = callback
   o.RequestTokenURL = "https://api.twitter.com/oauth/request_token"
   o.OwnerAuthURL = "https://api.twitter.com/oauth/authorize"
   o.AccessTokenURL = "https://api.twitter.com/oauth/access_token"
@@ -21,39 +20,35 @@ func newOAuth() *oauth.OAuth {
 }
 
 func twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
-  o := newOAuth()
-
-  err := o.GetRequestToken()
+  err := twitterOAuth.GetRequestToken()
   if err != nil {
     fmt.Println(err)
     return
   }
 
-  url, err := o.AuthorizationURL()
+  url, err := twitterOAuth.AuthorizationURL()
   if err != nil {
     fmt.Println(err)
     return
   }
 
   session, _ := store.Get(req, "session")
-  session.Values["requestToken"] = o.RequestToken
-  session.Values["requestSecret"] = o.RequestSecret
+  session.Values["requestToken"] = twitterOAuth.RequestToken
+  session.Values["requestSecret"] = twitterOAuth.RequestSecret
   session.Save(req, c)
 
   http.Redirect(c, req, url, 302)
 }
 
 func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
-  o := newOAuth()
-
   session, _ := store.Get(req, "session")
-  o.RequestToken = session.Values["requestToken"].(string)
-  o.RequestSecret = session.Values["requestSecret"].(string)
+  twitterOAuth.RequestToken = session.Values["requestToken"].(string)
+  twitterOAuth.RequestSecret = session.Values["requestSecret"].(string)
 
   req.ParseForm()
   token := req.Form.Get("oauth_verifier")
 
-  err := o.GetAccessToken(token)
+  err := twitterOAuth.GetAccessToken(token)
 
   if err != nil {
     fmt.Println(err)
@@ -61,8 +56,8 @@ func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
     return
   }
 
-  session.Values["user"] = o.UserName()
+  session.Values["user"] = twitterOAuth.UserName()
   session.Save(req, c)
 
-  http.Redirect(c, req, ("/chat/" + o.UserName()), 302)
+  http.Redirect(c, req, ("/chat/" + twitterOAuth.UserName()), 302)
 }
