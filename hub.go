@@ -14,6 +14,12 @@ type Hub struct {
   unregister chan *Connection
 }
 
+type Room struct {
+  Name string
+
+  connections map[*Connection]bool
+}
+
 func newHub() *Hub {
   return &Hub{
     broadcast:   make(chan *Message),
