@@ -2,7 +2,7 @@ package main
 
 
 import (
-  "fmt"
+  "log"
   "github.com/alloy-d/goauth"
   "net/http"
 )
@@ -22,13 +22,13 @@ func newTwitterOAuth(key, secret, callback string) *oauth.OAuth {
 func twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
   err := twitterOAuth.GetRequestToken()
   if err != nil {
-    fmt.Println(err)
+    log.Println(err)
     return
   }
 
   url, err := twitterOAuth.AuthorizationURL()
   if err != nil {
-    fmt.Println(err)
+    log.Println(err)
     return
   }
 
@@ -51,7 +51,7 @@ func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
   err := twitterOAuth.GetAccessToken(token)
 
   if err != nil {
-    fmt.Println(err)
+    log.Println(err)
     http.Redirect(c, req, "/", 403)
     return
   }
