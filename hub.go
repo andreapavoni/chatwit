@@ -56,16 +56,15 @@ func (h *Hub) run() {
 func (h *Hub) joinRoom(c *Connection) {
   var room *Room
 
-  if room = hub.rooms[c.room]; room == nil {
+  if room = h.rooms[c.room]; room == nil {
     room = &Room{Name: c.room, connections: make(map[*Connection]bool)}
   }
 
   room.connections[c] = true
-  hub.rooms[c.room] = room
+  h.rooms[c.room] = room
 }
 
 func (h *Hub) leaveRoom(c *Connection) {
-  delete(hub.rooms, c.room)
+  delete(h.rooms, c.room)
   close(c.send)
 }
-

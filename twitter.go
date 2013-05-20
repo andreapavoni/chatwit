@@ -19,45 +19,43 @@ func newTwitterOAuth(key, secret, callback string) *oauth.OAuth {
   return o
 }
 
-func twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
-  err := twitterOAuth.GetRequestToken()
+func (s *Server) twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
+  err := s.oauth.GetRequestToken()
   if err != nil {
     log.Println(err)
     return
   }
 
-  url, err := twitterOAuth.AuthorizationURL()
+  url, err := s.oauth.AuthorizationURL()
   if err != nil {
     log.Println(err)
     return
   }
 
-  session, _ := store.Get(req, "session")
-  session.Values["requestToken"] = twitterOAuth.RequestToken
-  session.Values["requestSecret"] = twitterOAuth.RequestSecret
+  session, _ := s.store.Get(req, "session")
+  session.Values["requestToken"] = s.oauth.RequestToken
+  session.Values["requestSecret"] = s.oauth.RequestSecret
   session.Save(req, c)
 
   http.Redirect(c, req, url, 302)
 }
 
-func twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
-  session, _ := store.Get(req, "session")
-  twitterOAuth.RequestToken = session.Values["requestToken"].(string)
-  twitterOAuth.RequestSecret = session.Values["requestSecret"].(string)
+func (s *Server) twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
+  session, _ := s.store.Get(req, "session")
+  s.oauth.RequestToken = session.Values["requestToken"].(string)
+  s.oauth.RequestSecret = session.Values["requestSecret"].(string)
 
   req.ParseForm()
   token := req.Form.Get("oauth_verifier")
 
-  err := twitterOAuth.GetAccessToken(token)
-
-  if err != nil {
+  if err := s.oauth.GetAccessToken(token) ; err != nil {
     log.Println(err)
     http.Redirect(c, req, "/", 403)
     return
   }
 
-  session.Values["user"] = twitterOAuth.UserName()
+  session.Values["user"] = s.oauth.UserName()
   session.Save(req, c)
 
-  http.Redirect(c, req, ("/chat/" + twitterOAuth.UserName()), 302)
+  http.Redirect(c, req, ("/chat/" + s.oauth.UserName()), 302)
 }

@@ -3,7 +3,6 @@ package main
 import (
   "code.google.com/p/go.net/websocket"
   "fmt"
-  "github.com/gorilla/mux"
 )
 
 type Connection struct {
@@ -15,6 +14,9 @@ type Connection struct {
 
   // the Room name
   room string
+
+  // the Server it belongs to
+  server *Server
 }
 
 type Message struct {
@@ -34,7 +36,7 @@ func (c *Connection) reader() {
     if err != nil {
       break
     }
-    broadcastMessage(&message)
+    c.broadcastMessage(&message)
   }
   c.ws.Close()
 }
@@ -49,25 +51,11 @@ func (c *Connection) writer() {
   c.ws.Close()
 }
 
-func wsHandler(ws *websocket.Conn) {
-  params := mux.Vars(ws.Request())
-  roomId := params["id"]
-
-  c := &Connection{send: make(chan string, 256), ws: ws, room: roomId}
-
-  hub.register <- c
-
-  defer func() { hub.unregister <- c }()
-  go c.writer()
-  c.reader()
-}
-
-func broadcastMessage(message *Message) {
-  session, _ := store.Get(message.connection.ws.Request(), "session")
+func (c *Connection) broadcastMessage(message *Message) {
+  session, _ := c.server.store.Get(message.connection.ws.Request(), "session")
   nickname := session.Values["user"].(string)
 
   msg := fmt.Sprintf("%s -> %s", nickname, message.Text)
   message.Text = msg
-  hub.broadcast <- message
+  c.server.hub.broadcast <- message
 }
-
