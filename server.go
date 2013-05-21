@@ -29,15 +29,17 @@ type ConfigServer struct {
 }
 
 func NewServer(c *ConfigServer) *Server {
-  return &Server{
-    indexTemplate: template.Must(template.ParseFiles("views/index.html")),
-    chatTemplate:  template.Must(template.ParseFiles("views/chat.html")),
-    hub:           newHub(),
 
-    // TODO: load these settings from command line flags
-    oauth: NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback),
-    store: sessions.NewCookieStore([]byte(c.storeSecret)),
-  }
+  s := Server{}
+  s.indexTemplate = template.Must(template.ParseFiles("views/index.html"))
+  s.chatTemplate =  template.Must(template.ParseFiles("views/chat.html"))
+  s.hub =           newHub(&s)
+
+  // TODO: load these settings from command line flags
+  s.oauth = NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback)
+  s.store = sessions.NewCookieStore([]byte(c.storeSecret))
+
+  return &s
 }
 
 func (s *Server) Run(host string) {
@@ -91,7 +93,7 @@ func (s *Server) wsHandler(ws *websocket.Conn) {
   params := mux.Vars(ws.Request())
   roomId := params["id"]
 
-  c := &Connection{send: make(chan string, 256), ws: ws, room: roomId, server: s}
+  c := &Connection{send: make(chan string, 256), ws: ws, room: roomId, hub: s.hub}
 
   s.hub.register <- c
 

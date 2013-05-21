@@ -1,5 +1,10 @@
 package main
 
+import(
+  "fmt"
+)
+
+
 type Hub struct {
   // Registered rooms.
   rooms map[string]*Room
@@ -12,6 +17,8 @@ type Hub struct {
 
   // Unregister requests from connections.
   unregister chan *Connection
+
+  server *Server
 }
 
 type Room struct {
@@ -20,12 +27,13 @@ type Room struct {
   connections map[*Connection]bool
 }
 
-func newHub() *Hub {
+func newHub(server *Server) *Hub {
   return &Hub{
     broadcast:   make(chan *Message),
     register:    make(chan *Connection),
     unregister:  make(chan *Connection),
     rooms:       make(map[string]*Room),
+    server: server,
   }
 }
 
@@ -67,4 +75,13 @@ func (h *Hub) joinRoom(c *Connection) {
 func (h *Hub) leaveRoom(c *Connection) {
   delete(h.rooms, c.room)
   close(c.send)
+}
+
+func (h *Hub) broadcastMessage(message *Message) {
+  session, _ := h.server.store.Get(message.connection.ws.Request(), "session")
+  nickname := session.Values["user"].(string)
+
+  msg := fmt.Sprintf("%s -> %s", nickname, message.Text)
+  message.Text = msg
+  h.broadcast <- message
 }

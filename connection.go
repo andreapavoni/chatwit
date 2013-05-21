@@ -2,7 +2,6 @@ package main
 
 import (
   "code.google.com/p/go.net/websocket"
-  "fmt"
 )
 
 type Connection struct {
@@ -15,8 +14,8 @@ type Connection struct {
   // the Room name
   room string
 
-  // the Server it belongs to
-  server *Server
+  // the Hub it belongs to
+  hub *Hub
 }
 
 type Message struct {
@@ -36,7 +35,7 @@ func (c *Connection) reader() {
     if err != nil {
       break
     }
-    c.broadcastMessage(&message)
+    c.hub.broadcastMessage(&message)
   }
   c.ws.Close()
 }
@@ -51,11 +50,11 @@ func (c *Connection) writer() {
   c.ws.Close()
 }
 
-func (c *Connection) broadcastMessage(message *Message) {
-  session, _ := c.server.store.Get(message.connection.ws.Request(), "session")
-  nickname := session.Values["user"].(string)
+/*func (c *Connection) broadcastMessage(message *Message) {*/
+  /*session, _ := c.server.store.Get(message.connection.ws.Request(), "session")*/
+  /*nickname := session.Values["user"].(string)*/
 
-  msg := fmt.Sprintf("%s -> %s", nickname, message.Text)
-  message.Text = msg
-  c.server.hub.broadcast <- message
-}
+  /*msg := fmt.Sprintf("%s -> %s", nickname, message.Text)*/
+  /*message.Text = msg*/
+  /*c.server.hub.broadcast <- message*/
+/*}*/
