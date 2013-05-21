@@ -27,6 +27,15 @@ type Room struct {
   connections map[*Connection]bool
 }
 
+type Message struct {
+  // The text of the message
+  Text string
+
+  // Connection relative to the current Room
+  connection *Connection
+}
+
+
 func newHub(server *Server) *Hub {
   return &Hub{
     broadcast:   make(chan *Message),
@@ -53,7 +62,6 @@ func (h *Hub) run() {
           case c.send <- m.Text:
           default:
             h.leaveRoom(c)
-            go c.ws.Close()
           }
         }
       }
@@ -75,10 +83,11 @@ func (h *Hub) joinRoom(c *Connection) {
 func (h *Hub) leaveRoom(c *Connection) {
   delete(h.rooms, c.room)
   close(c.send)
+  go c.ws.Close()
 }
 
 func (h *Hub) broadcastMessage(message *Message) {
-  session, _ := h.server.store.Get(message.connection.ws.Request(), "session")
+  session, _ := h.server.cookies.Get(message.connection.ws.Request(), "session")
   nickname := session.Values["user"].(string)
 
   msg := fmt.Sprintf("%s -> %s", nickname, message.Text)

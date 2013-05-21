@@ -32,7 +32,7 @@ func (s *Server) twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
     return
   }
 
-  session, _ := s.store.Get(req, "session")
+  session, _ := s.cookies.Get(req, "session")
   session.Values["requestToken"] = s.oauth.RequestToken
   session.Values["requestSecret"] = s.oauth.RequestSecret
   session.Save(req, c)
@@ -41,7 +41,7 @@ func (s *Server) twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Request) {
-  session, _ := s.store.Get(req, "session")
+  session, _ := s.cookies.Get(req, "session")
   s.oauth.RequestToken = session.Values["requestToken"].(string)
   s.oauth.RequestSecret = session.Values["requestSecret"].(string)
 

@@ -13,7 +13,7 @@ import (
 type Server struct {
   hub   *Hub
   oauth *oauth.OAuth
-  store *sessions.CookieStore
+  cookies *sessions.CookieStore
 
   // TODO: these should go to map[string]*Template
   indexTemplate *template.Template
@@ -37,7 +37,7 @@ func NewServer(c *ConfigServer) *Server {
 
   // TODO: load these settings from command line flags
   s.oauth = NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback)
-  s.store = sessions.NewCookieStore([]byte(c.storeSecret))
+  s.cookies = sessions.NewCookieStore([]byte(c.storeSecret))
 
   return &s
 }
@@ -73,7 +73,7 @@ func (s *Server) homeHandler(c http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) chatHandler(c http.ResponseWriter, req *http.Request) {
-  session, _ := s.store.Get(req, "session")
+  session, _ := s.cookies.Get(req, "session")
 
   if session.Values["user"] == nil {
     http.Redirect(c, req, "/", 403)
