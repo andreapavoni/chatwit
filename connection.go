@@ -41,3 +41,9 @@ func (c *Connection) writer() {
   }
   c.ws.Close()
 }
+
+// Listen for read/write messages
+func (c *Connection) Run() {
+  go c.writer()
+  c.reader()
+}

@@ -99,11 +99,16 @@ func (s *Server) wsHandler(ws *websocket.Conn) {
   roomId := params["id"]
   nickname := s.GetSession(ws.Request(), "user")
 
-  c := &Connection{send: make(chan string, 256), ws: ws, room: roomId, hub: s.hub, nickname: nickname}
+  conn := &Connection{
+    send: make(chan string, 256),
+    ws: ws,
+    room: roomId,
+    hub: s.hub,
+    nickname: nickname,
+  }
 
-  s.hub.register <- c
+  s.hub.register <- conn
 
-  defer func() { s.hub.unregister <- c }()
-  go c.writer()
-  c.reader()
+  defer func() { s.hub.unregister <- conn }()
+  conn.Run()
 }
