@@ -61,7 +61,12 @@ func (s *Server) Run(host string) {
   }
 }
 
-// Web stuff
+func (s *Server) GetSession(req *http.Request, value string) string {
+  session, _ := s.cookies.Get(req, "session")
+  return session.Values[value].(string)
+}
+
+// Handlers
 
 type chatData struct {
   Host   string

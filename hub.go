@@ -70,6 +70,8 @@ func (h *Hub) run() {
 }
 
 func (h *Hub) joinRoom(c *Connection) {
+  nickname := h.server.GetSession(c.ws.Request(), "user")
+
   var room *Room
 
   if room = h.rooms[c.room]; room == nil {
@@ -78,19 +80,40 @@ func (h *Hub) joinRoom(c *Connection) {
 
   room.connections[c] = true
   h.rooms[c.room] = room
+
+
+  h.statusMessage(("*** SERVER: " + nickname + " has joined " + room.Name + " ****" ), room)
+
 }
 
 func (h *Hub) leaveRoom(c *Connection) {
+  nickname := h.server.GetSession(c.ws.Request(), "user")
+  h.statusMessage(("*** SERVER: " + nickname + " has left " + c.room + " ****" ), h.rooms[c.room])
+
   delete(h.rooms, c.room)
   close(c.send)
   go c.ws.Close()
+
+
+  // TODO: check if room is empty and delete it accordingly
 }
 
+// Broadcasts a user message to the Room
 func (h *Hub) broadcastMessage(message *Message) {
-  session, _ := h.server.cookies.Get(message.connection.ws.Request(), "session")
-  nickname := session.Values["user"].(string)
+  nickname := h.server.GetSession(message.connection.ws.Request(), "user")
 
   msg := fmt.Sprintf("%s -> %s", nickname, message.Text)
   message.Text = msg
   h.broadcast <- message
+}
+
+// Broadcasts Hub message to the Room
+func (h *Hub) statusMessage(message string, room *Room) {
+  for c := range room.connections {
+    select {
+    case c.send <- message:
+    default:
+      h.leaveRoom(c)
+    }
+  }
 }
