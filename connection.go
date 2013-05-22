@@ -2,6 +2,7 @@ package main
 
 import (
   "code.google.com/p/go.net/websocket"
+  "log"
 )
 
 type Connection struct {
@@ -22,12 +23,14 @@ type Connection struct {
 
 func (c *Connection) reader() {
   for {
-    var text string
-    message := Message{Text: text, connection: c}
+    var rcv string
 
-    if err := websocket.Message.Receive(c.ws, &message.Text); err != nil {
+    if err := websocket.Message.Receive(c.ws, &rcv); err != nil {
+      log.Println("ERROR WS RCV: ", err)
       break
     }
+
+    message := Message{Text: rcv, connection: c}
     c.hub.broadcastMessage(&message)
   }
   c.ws.Close()
@@ -35,7 +38,7 @@ func (c *Connection) reader() {
 
 func (c *Connection) writer() {
   for message := range c.send {
-    if err := websocket.Message.Send(c.ws, message); err != nil {
+    if err := websocket.JSON.Send(c.ws, message); err != nil {
       break
     }
   }
