@@ -16,6 +16,8 @@ type Connection struct {
 
   // the Hub it belongs to
   hub *Hub
+
+  nickname string
 }
 
 func (c *Connection) reader() {

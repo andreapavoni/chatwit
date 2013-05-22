@@ -97,8 +97,9 @@ func (s *Server) notFound(c http.ResponseWriter, req *http.Request) {
 func (s *Server) wsHandler(ws *websocket.Conn) {
   params := mux.Vars(ws.Request())
   roomId := params["id"]
+  nickname := s.GetSession(ws.Request(), "user")
 
-  c := &Connection{send: make(chan string, 256), ws: ws, room: roomId, hub: s.hub}
+  c := &Connection{send: make(chan string, 256), ws: ws, room: roomId, hub: s.hub, nickname: nickname}
 
   s.hub.register <- c
 
