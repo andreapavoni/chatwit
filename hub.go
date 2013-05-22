@@ -1,9 +1,8 @@
 package main
 
-import(
+import (
   "fmt"
 )
-
 
 type Hub struct {
   // Registered rooms.
@@ -35,14 +34,13 @@ type Message struct {
   connection *Connection
 }
 
-
 func newHub(server *Server) *Hub {
   return &Hub{
-    broadcast:   make(chan *Message),
-    register:    make(chan *Connection),
-    unregister:  make(chan *Connection),
-    rooms:       make(map[string]*Room),
-    server: server,
+    broadcast:  make(chan *Message),
+    register:   make(chan *Connection),
+    unregister: make(chan *Connection),
+    rooms:      make(map[string]*Room),
+    server:     server,
   }
 }
 
@@ -79,12 +77,11 @@ func (h *Hub) joinRoom(c *Connection) {
   room.connections[c] = true
   h.rooms[c.room] = room
 
-
-  h.statusMessage(("*** SERVER: " + c.nickname + " has joined " + c.room + " ****" ), room)
+  h.statusMessage(("*** SERVER: " + c.nickname + " has joined " + c.room + " ****"), room)
 }
 
 func (h *Hub) leaveRoom(c *Connection) {
-  h.statusMessage(("*** SERVER: " + c.nickname + " has left " + c.room + " ****" ), h.rooms[c.room])
+  h.statusMessage(("*** SERVER: " + c.nickname + " has left " + c.room + " ****"), h.rooms[c.room])
   room := h.rooms[c.room]
 
   delete(room.connections, c)

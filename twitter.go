@@ -1,9 +1,8 @@
 package main
 
-
 import (
-  "log"
   "github.com/alloy-d/goauth"
+  "log"
   "net/http"
 )
 
@@ -48,7 +47,7 @@ func (s *Server) twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Req
   req.ParseForm()
   token := req.Form.Get("oauth_verifier")
 
-  if err := s.oauth.GetAccessToken(token) ; err != nil {
+  if err := s.oauth.GetAccessToken(token); err != nil {
     log.Println(err)
     http.Redirect(c, req, "/", 403)
     return

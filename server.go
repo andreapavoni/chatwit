@@ -11,8 +11,8 @@ import (
 )
 
 type Server struct {
-  hub   *Hub
-  oauth *oauth.OAuth
+  hub     *Hub
+  oauth   *oauth.OAuth
   cookies *sessions.CookieStore
 
   // TODO: these should go to map[string]*Template
@@ -32,8 +32,8 @@ func NewServer(c *ConfigServer) *Server {
 
   s := Server{}
   s.indexTemplate = template.Must(template.ParseFiles("views/index.html"))
-  s.chatTemplate =  template.Must(template.ParseFiles("views/chat.html"))
-  s.hub =           newHub(&s)
+  s.chatTemplate = template.Must(template.ParseFiles("views/chat.html"))
+  s.hub = newHub(&s)
 
   // TODO: load these settings from command line flags
   s.oauth = NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback)
@@ -100,10 +100,10 @@ func (s *Server) wsHandler(ws *websocket.Conn) {
   nickname := s.GetSession(ws.Request(), "user")
 
   conn := &Connection{
-    send: make(chan string, 256),
-    ws: ws,
-    room: roomId,
-    hub: s.hub,
+    send:     make(chan string, 256),
+    ws:       ws,
+    room:     roomId,
+    hub:      s.hub,
     nickname: nickname,
   }
 
