@@ -26,15 +26,7 @@ type Room struct {
   connections map[*Connection]bool
 }
 
-type Message struct {
-  // The text of the message
-  Text string
-
-  // Connection relative to the current Room
-  connection *Connection
-}
-
-func newHub(server *Server) *Hub {
+func NewHub(server *Server) *Hub {
   return &Hub{
     broadcast:  make(chan *Message),
     register:   make(chan *Connection),

@@ -33,7 +33,7 @@ func NewServer(c *ConfigServer) *Server {
   s := Server{}
   s.indexTemplate = template.Must(template.ParseFiles("views/index.html"))
   s.chatTemplate = template.Must(template.ParseFiles("views/chat.html"))
-  s.hub = newHub(&s)
+  s.hub = NewHub(&s)
 
   // TODO: load these settings from command line flags
   s.oauth = NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback)
