@@ -5,8 +5,8 @@ import (
   "log"
 )
 
-type Connection struct {
-  // The websocket connection.
+type Client struct {
+  // The websocket client.
   ws *websocket.Conn
 
   // Buffered channel of outbound messages.
@@ -21,7 +21,7 @@ type Connection struct {
   nickname string
 }
 
-func (c *Connection) reader() {
+func (c *Client) reader() {
   for {
     var rcv string
 
@@ -30,13 +30,13 @@ func (c *Connection) reader() {
       break
     }
 
-    message := Message{Text: rcv, connection: c}
+    message := Command{Text: rcv, client: c}
     c.hub.broadcastMessage(&message)
   }
   c.ws.Close()
 }
 
-func (c *Connection) writer() {
+func (c *Client) writer() {
   for message := range c.send {
     if err := websocket.JSON.Send(c.ws, message); err != nil {
       break
@@ -46,7 +46,7 @@ func (c *Connection) writer() {
 }
 
 // Listen for read/write messages
-func (c *Connection) Run() {
+func (c *Client) Run() {
   go c.writer()
   c.reader()
 }

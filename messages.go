@@ -1,7 +1,14 @@
-type Message struct {
-  // The text of the message
-  Text string
+package main
 
-  // Connection relative to the current Room
-  connection *Connection
+// Events
+const (
+  MSG = iota
+  JOIN
+  PART
+)
+
+type Command struct {
+  Event int
+  Arguments interface{}
+  client *Client
 }
