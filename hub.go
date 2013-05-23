@@ -1,9 +1,5 @@
 package main
 
-import (
-  "fmt"
-)
-
 type Hub struct {
   // Registered rooms.
   rooms map[string]*Room
@@ -40,16 +36,16 @@ func (h *Hub) run() {
   go func() {
     for {
       select {
-      case c := <-h.register:
-        h.joinRoom(c)
+      case client := <-h.register:
+        h.joinRoom(client)
 
-      case c := <-h.unregister:
-        h.leaveRoom(c)
+      case client := <-h.unregister:
+        h.leaveRoom(client)
 
-      case m := <-h.broadcast:
-        for c := range h.rooms[m.client.room].clients {
+      case cmd := <-h.broadcast:
+        for c := range h.rooms[cmd.client.room].clients {
           select {
-          case c.send <- m.Text:
+          case c.out <- cmd:
           default:
             h.leaveRoom(c)
           }
@@ -69,15 +65,18 @@ func (h *Hub) joinRoom(c *Client) {
   room.clients[c] = true
   h.rooms[c.room] = room
 
-  h.statusMessage(("*** SERVER: " + c.nickname + " has joined " + c.room + " ****"), room)
+  join := JoinCommand{Nickname: c.nickname}
+  h.statusMessage(&Command{Event: JOIN, Arguments: join, client: c})
 }
 
 func (h *Hub) leaveRoom(c *Client) {
-  h.statusMessage(("*** SERVER: " + c.nickname + " has left " + c.room + " ****"), h.rooms[c.room])
+  part := PartCommand{Nickname: c.nickname}
   room := h.rooms[c.room]
 
+  h.statusMessage(&Command{Event: PART, Arguments: part, client: c})
+
   delete(room.clients, c)
-  close(c.send)
+  close(c.out)
   go c.ws.Close()
 
   // remove Room if empty
@@ -87,19 +86,16 @@ func (h *Hub) leaveRoom(c *Client) {
 }
 
 // Broadcasts a user message to the Room
-func (h *Hub) broadcastMessage(message *Command) {
-  msg := fmt.Sprintf("%s -> %s", message.client.nickname, message.Text)
-  message.Text = msg
-  h.broadcast <- message
+func (h *Hub) broadcastMessage(cmd *Command) {
+  h.broadcast <- cmd
 }
 
 // Broadcasts Hub message to the Room
-func (h *Hub) statusMessage(message string, room *Room) {
-  for c := range room.clients {
+func (h *Hub) statusMessage(cmd *Command) {
+  for c := range cmd.client.hub.rooms[cmd.client.room].clients {
     select {
-    case c.send <- message:
+    case c.out <- cmd:
     default:
-      h.leaveRoom(c)
     }
   }
 }

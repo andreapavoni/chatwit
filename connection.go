@@ -2,7 +2,6 @@ package main
 
 import (
   "code.google.com/p/go.net/websocket"
-  "log"
 )
 
 type Client struct {
@@ -10,7 +9,7 @@ type Client struct {
   ws *websocket.Conn
 
   // Buffered channel of outbound messages.
-  send chan string
+  out chan *Command
 
   // the Room name
   room string
@@ -26,19 +25,18 @@ func (c *Client) reader() {
     var rcv string
 
     if err := websocket.Message.Receive(c.ws, &rcv); err != nil {
-      log.Println("ERROR WS RCV: ", err)
       break
     }
 
-    message := Command{Text: rcv, client: c}
-    c.hub.broadcastMessage(&message)
+    msg := MsgCommand{Body: rcv, Nickname: c.nickname}
+    c.hub.broadcastMessage(&Command{Event: MSG, Arguments: msg, client: c})
   }
   c.ws.Close()
 }
 
 func (c *Client) writer() {
-  for message := range c.send {
-    if err := websocket.JSON.Send(c.ws, message); err != nil {
+  for cmd := range c.out {
+    if err := websocket.JSON.Send(c.ws, cmd); err != nil {
       break
     }
   }
