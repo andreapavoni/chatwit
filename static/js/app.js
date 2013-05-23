@@ -13,6 +13,24 @@ $(function() {
     }
   }
 
+  function timestamp() {
+    return (new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1"));
+  }
+
+  function formatMsg(data) {
+    switch(data.Event) {
+      case 0:
+        appendLog($("<div><b>[" + timestamp() + "] " + data.Arguments.Nickname + ":</b> " + data.Arguments.Body + "</div>"));
+        break;
+      case 1:
+        appendLog($("<div><b>[" + timestamp() + "] " + "*** " + data.Arguments.Nickname + " has joined ***</b></div>"));
+        break;
+      case 2:
+        appendLog($("<div><b>[" + timestamp() + "] " + "*** " + data.Arguments.Nickname + " has left ***</b></div>"));
+        break;
+    }
+  }
+
   $("#form").submit(function() {
     if (!conn) {
       return false;
@@ -26,16 +44,22 @@ $(function() {
   });
 
   if (window["WebSocket"]) {
-    // console.log($('body').data("socket"))
-
     conn = new WebSocket($("body").data("socket"));
+
     conn.onclose = function(evt) {
-      appendLog($("<div><b>Connection closed.</b></div>"))
+      appendLog($("<div><b>*** Connection closed. ***</b></div>"))
     }
+
     conn.onmessage = function(evt) {
-      appendLog($("<div/>").text(evt.data))
+      console.log(evt.data);
+
+      o = jQuery.parseJSON(evt.data)
+      console.log(o["Event"]);
+      console.log(o.Event);
+
+      formatMsg(o);
     }
   } else {
-    appendLog($("<div><b>Your browser does not support WebSockets.</b></div>"))
+    appendLog($("<div><b>*** Your browser does not support WebSockets. ***</b></div>"))
   }
 });
