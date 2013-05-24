@@ -35,7 +35,6 @@ func NewServer(c *ConfigServer) *Server {
   s.chatTemplate = template.Must(template.ParseFiles("views/chat.html"))
   s.hub = NewHub(&s)
 
-  // TODO: load these settings from command line flags
   s.oauth = NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback)
   s.cookies = sessions.NewCookieStore([]byte(c.storeSecret))
 
@@ -74,7 +73,13 @@ type chatData struct {
 }
 
 func (s *Server) homeHandler(c http.ResponseWriter, req *http.Request) {
-  s.indexTemplate.Execute(c, req.Host)
+  if nickname := s.GetSession(req, "user"); nickname == "" {
+    s.indexTemplate.Execute(c, req.Host)
+  } else {
+    // TODO: serve a dashboard-like page with connected friends and/or available chat rooms
+    // based on friends and/or trending topics
+    http.Redirect(c, req, ("/chat/" + nickname), 302)
+  }
 }
 
 func (s *Server) chatHandler(c http.ResponseWriter, req *http.Request) {
