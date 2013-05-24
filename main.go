@@ -14,7 +14,7 @@ func main() {
   // oauth
   key := flag.String("oa-key", "M9MHfTfKDyF5yZM6xueTxg", "OAuth consumer key")
   secret := flag.String("oa-secret", "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo", "OAuth consumer secret")
-  callbackUrl := fmt.Sprintf("%s/auth/twitter/callback", *address)
+  callbackUrl := fmt.Sprintf("http://%s/auth/twitter/callback", *address)
 
   // session cookie
   session := flag.String("session-secret", "foobarsecret", "Session secret key")
