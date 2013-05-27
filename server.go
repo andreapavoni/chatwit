@@ -15,9 +15,8 @@ type Server struct {
   oauth   *oauth.OAuth
   cookies *sessions.CookieStore
 
-  // TODO: these should go to map[string]*Template
-  indexTemplate *template.Template
-  chatTemplate  *template.Template
+  tmpl map[string]*template.Template
+
 }
 
 type ConfigServer struct {
@@ -31,8 +30,11 @@ type ConfigServer struct {
 func NewServer(c *ConfigServer) *Server {
 
   s := Server{}
-  s.indexTemplate = template.Must(template.ParseFiles("views/index.html"))
-  s.chatTemplate = template.Must(template.ParseFiles("views/chat.html"))
+
+  s.tmpl = make(map[string]*template.Template)
+  s.tmpl["index"] = template.Must(template.ParseFiles("views/index.html", "views/layout.html"))
+  s.tmpl["chat"] = template.Must(template.ParseFiles("views/chat.html", "views/layout.html"))
+
   s.hub = NewHub(&s)
 
   s.oauth = NewTwitterOAuth(c.oauthKey, c.oauthSecret, c.oauthCallback)
@@ -74,7 +76,7 @@ type chatData struct {
 
 func (s *Server) homeHandler(c http.ResponseWriter, req *http.Request) {
   if nickname := s.GetSession(req, "user"); nickname == "" {
-    s.indexTemplate.Execute(c, req.Host)
+    s.tmpl["index"].ExecuteTemplate(c, "layout", req.Host)
   } else {
     // TODO: serve a dashboard-like page with connected friends and/or available chat rooms
     // based on friends and/or trending topics
@@ -92,7 +94,7 @@ func (s *Server) chatHandler(c http.ResponseWriter, req *http.Request) {
   params := mux.Vars(req)
   roomId := params["id"]
 
-  s.chatTemplate.Execute(c, &chatData{Host: req.Host, RoomId: roomId})
+  s.tmpl["chat"].ExecuteTemplate(c, "layout", &chatData{Host: req.Host, RoomId: roomId})
 }
 
 func (s *Server) notFound(c http.ResponseWriter, req *http.Request) {

@@ -1,16 +1,15 @@
-<html>
-  <head>
-    <title>Chat Example</title>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="/static/js/app.js"></script>
-    <link href="/static/css/style.css" media="screen" rel="stylesheet" type="text/css" />
-  </head>
-  <body data-socket="ws://{{$.Host}}/ws/{{$.RoomId}}">
-    <div id="log"></div>
-    <form id="form" >
-      <input type="submit" value="Send" />
-      <input type="text" id="msg" size="64"/>
-    </form>
-  </body>
-</html>
+{{define "head"}}
+  <title>Chat Example</title>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script type="text/javascript" src="/static/js/app.js"></script>
+  <link href="/static/css/style.css" media="screen" rel="stylesheet" type="text/css" />
+{{end}}
+
+{{define "body"}}
+  <div id="log"></div>
+  <form id="form" data-socket="ws://{{$.Host}}/ws/{{$.RoomId}}">
+    <input type="submit" value="Send" />
+    <input type="text" id="msg" size="64"/>
+  </form>
+{{end}}
 

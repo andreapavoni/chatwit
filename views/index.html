@@ -1,11 +1,9 @@
-<html>
-  <head>
-    <title>Chat Example</title>
-    <link href="/static/css/style.css" media="screen" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
-    <h1>Welcome to ChaTwit</h1>
-    <a href="/auth/twitter">Connect with Twitter</a>
-  </body>
-</html>
+{{define "head"}}
+  <title>Chat Example</title>
+  <link href="/static/css/style.css" media="screen" rel="stylesheet" type="text/css" />
+{{end}}
 
+{{define "body"}}
+  <h1>Welcome to ChaTwit</h1>
+  <a href="/auth/twitter">Connect with Twitter</a>
+{{end}}

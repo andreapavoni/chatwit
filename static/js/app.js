@@ -44,7 +44,7 @@ $(function() {
   });
 
   if (window["WebSocket"]) {
-    conn = new WebSocket($("body").data("socket"));
+    conn = new WebSocket($("#form").data("socket"));
 
     conn.onclose = function(evt) {
       appendLog($("<div><b>*** Connection closed. ***</b></div>"))
