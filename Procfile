@@ -1,1 +1,1 @@
-web: chatwit -conf production.config.json
+web: chatwit -conf production.conf.json
