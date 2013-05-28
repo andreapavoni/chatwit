@@ -1,1 +1,1 @@
-web: chatwit -conf production.conf.json
+web: chatwit -conf production.conf.json -port $PORT
