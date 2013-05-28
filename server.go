@@ -46,6 +46,7 @@ func (s *Server) Run(host string) {
 
   router := mux.NewRouter()
   router.HandleFunc("/", s.homeHandler).Methods("GET")
+  router.HandleFunc("/logout", s.logoutHandler).Methods("GET")
   router.HandleFunc("/auth/twitter", s.twitterAuthHandler).Methods("GET")
   router.HandleFunc("/auth/twitter/callback", s.twitterAuthCallbackHandler).Methods("GET")
   router.HandleFunc("/chat/{id:[A-Za-z0-9]+}", s.chatHandler).Methods("GET")
@@ -122,4 +123,13 @@ func (s *Server) wsHandler(ws *websocket.Conn) {
 
   defer func() { s.hub.unregister <- client }()
   client.Run()
+}
+
+func (s *Server) logoutHandler(c http.ResponseWriter, req *http.Request) {
+  if session, _ := s.cookies.Get(req, "session"); session.Values["user"] != nil {
+    session.Options = &sessions.Options{MaxAge: -1}
+    session.Save(req, c)
+  }
+
+  http.Redirect(c, req, "/", 302)
 }
