@@ -14,9 +14,7 @@ type Server struct {
   hub     *Hub
   oauth   *oauth.OAuth
   cookies *sessions.CookieStore
-
   tmpl map[string]*template.Template
-
 }
 
 type ConfigServer struct {
@@ -28,7 +26,6 @@ type ConfigServer struct {
 }
 
 func NewServer(c *ConfigServer) *Server {
-
   s := Server{}
 
   s.tmpl = make(map[string]*template.Template)
