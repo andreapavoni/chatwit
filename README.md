@@ -14,6 +14,12 @@ Do realtime chat with your twitter friends.
 
 ## Compile assets (for deploy)
 
+### Check support for SASS & Co
+
+```make assets-check-support```
+
+### Build assets
+
 ```make assets-bundle```
 
 # Todo

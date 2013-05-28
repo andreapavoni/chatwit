@@ -1,0 +1,2 @@
+/assets/javascripts/app.js  ->  /assets/javascripts/app-04af35ba3ae9aad7f9eb6eafd28dacf9.js
+/assets/stylesheets/style.css  ->  /assets/stylesheets/style-bb8747055d2d705e4c0f6bad6e8c5b24.css

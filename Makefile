@@ -23,3 +23,6 @@ setup:
 assets-bundle:
 	${GOPATH}/bin/train bundle
 
+assets-support-check:
+	${GOPATH}/bin/train diagnose
+
