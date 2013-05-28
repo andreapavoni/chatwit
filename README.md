@@ -2,13 +2,13 @@
 
 Do realtime chat with your twitter friends.
 
-# Setup
+## Setup
 
-## Install missing packages
+### Install missing packages
 
 ```make setup```
 
-## Build binary
+### Build binary
 
 ```make build```
 
@@ -26,5 +26,4 @@ Do realtime chat with your twitter friends.
 
 * add a decent GUI
 
-* twitter oauth
-  * use nickname and permission to post tweets on user timeline (low priority)
+* use nickname and permission to post tweets on user timeline (low priority)
