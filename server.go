@@ -68,8 +68,10 @@ func (s *Server) Run(host string) {
 }
 
 func (s *Server) GetSession(req *http.Request, value string) string {
-  session, _ := s.cookies.Get(req, "session")
-  return session.Values[value].(string)
+  if session, _ := s.cookies.Get(req, "session"); session.Values[value] != nil {
+    return session.Values[value].(string)
+  }
+  return ""
 }
 
 // Handlers
