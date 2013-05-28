@@ -4,6 +4,6 @@
   "OAuth": {
     "Key": "M9MHfTfKDyF5yZM6xueTxg",
     "Secret": "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo",
-    "Callback": "http://127.0.0.1:8000/auth/twitter/callback"
+    "Callback": "http://127.0.0.1:8080/auth/twitter/callback"
   }
 }
