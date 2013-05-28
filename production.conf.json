@@ -2,8 +2,8 @@
   "Address": "0.0.0.0",
   "SessionSecret": "foobarsecret",
   "OAuth": {
-    "Key": "M9MHfTfKDyF5yZM6xueTxg",
-    "Secret": "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo",
+    "Key": "5JrkTXyKetbRLm1OSxH5zQ",
+    "Secret": "Ub5D23eYnMX7FDwrFBAMtJa0Z4BnflTwA5kqJL5xY",
     "Callback": "http://chatwit.herokuapp.com"
   }
 }
