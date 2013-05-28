@@ -4,13 +4,17 @@ Do realtime chat with your twitter friends.
 
 # Setup
 
+## Install missing packages
+
+```make setup```
+
 ## Build binary
 
-make build
+```make build```
 
 ## Compile assets (for deploy)
 
-make assets-bundle
+```make assets-bundle```
 
 # Todo
 
