@@ -1,9 +1,9 @@
 {
-  "Address": "chatwit.herokuapp.com:80",
+  "Address": "chatwit.herokuapp.com",
   "SessionSecret": "foobarsecret",
   "OAuth": {
     "Key": "M9MHfTfKDyF5yZM6xueTxg",
     "Secret": "1lClcicoUNEKA1pycLLO0Jruo0NA2AgK3KhLFY4jo",
-    "Callback": "http://chatwit.herokuapp.com/auth/twitter/callback"
+    "Callback": "http://ADDRESS/auth/twitter/callback"
   }
 }
