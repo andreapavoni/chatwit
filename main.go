@@ -2,13 +2,16 @@ package main
 
 import (
   "log"
+  "flag"
 )
 
 func main() {
-  var config AppConfig
-  err := ReadJSONConfig("config.json", &config)
+  file := flag.String("conf", "development.conf.json", "configuration file")
+  flag.Parse()
 
-  if err != nil {
+  var config AppConfig
+
+  if  err := ReadJSONConfig((*file), &config); err != nil {
     log.Fatal(err)
   }
 
