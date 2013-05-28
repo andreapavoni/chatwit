@@ -1,8 +1,8 @@
 {{define "head"}}
   <title>Chat Example</title>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
-  <script type="text/javascript" src="/static/js/app.js"></script>
-  <link href="/static/css/style.css" media="screen" rel="stylesheet" type="text/css" />
+  {{javascript_tag "app"}}
+  {{stylesheet_tag "style"}}
 {{end}}
 
 {{define "body"}}

@@ -7,7 +7,8 @@ import (
   "github.com/gorilla/sessions"
   "log"
   "net/http"
-  "text/template"
+  "html/template"
+  "github.com/shaoshing/train"
 )
 
 type Server struct {
@@ -29,8 +30,8 @@ func NewServer(c *ConfigServer) *Server {
   s := Server{}
 
   s.tmpl = make(map[string]*template.Template)
-  s.tmpl["index"] = template.Must(template.ParseFiles("views/index.html", "views/layout.html"))
-  s.tmpl["chat"] = template.Must(template.ParseFiles("views/chat.html", "views/layout.html"))
+  s.tmpl["index"] = NewTemplate("views/index.html", "views/layout.html")
+  s.tmpl["chat"] = NewTemplate("views/chat.html", "views/layout.html")
 
   s.hub = NewHub(&s)
 
@@ -49,10 +50,16 @@ func (s *Server) Run(host string) {
   router.HandleFunc("/auth/twitter/callback", s.twitterAuthCallbackHandler).Methods("GET")
   router.HandleFunc("/chat/{id:[A-Za-z0-9]+}", s.chatHandler).Methods("GET")
   router.Handle("/ws/{id:[A-Za-z0-9]+}", websocket.Handler(s.wsHandler))
-  router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+  // this is no longer needed because we are using asset pipeline
+  //router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
   router.NotFoundHandler = http.HandlerFunc(s.notFound)
 
+
   http.Handle("/", router)
+
+  // setup asset pipeline
+  train.ConfigureHttpHandler(nil)
+  train.Config.BundleAssets = true
 
   if err := http.ListenAndServe(host, nil); err != nil {
     log.Fatal("ListenAndServe:", err)
