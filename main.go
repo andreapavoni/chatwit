@@ -3,7 +3,6 @@ package main
 import (
   "log"
   "flag"
-  "strings"
 )
 
 func main() {
@@ -17,15 +16,13 @@ func main() {
     log.Fatal(err)
   }
 
-  listen := conf.Address + ":" + *port
-
   srvConfig := ConfigServer{
     oauthKey:      conf.OAuth.Key,
     oauthSecret:   conf.OAuth.Secret,
-    oauthCallback: strings.Replace(conf.OAuth.Callback, "ADDRESS", listen, -1),
+    oauthCallback: conf.OAuth.Callback,
     storeSecret:   conf.SessionSecret,
   }
 
   server := NewServer(&srvConfig)
-  server.Run(listen)
+  server.Run(conf.Address + ":" + *port)
 }

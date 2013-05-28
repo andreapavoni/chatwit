@@ -10,7 +10,7 @@ func NewTwitterOAuth(key, secret, callback string) *oauth.OAuth {
   o := new(oauth.OAuth)
   o.ConsumerKey = key
   o.ConsumerSecret = secret
-  o.Callback = callback
+  o.Callback = callback + "/auth/twitter/callback"
   o.RequestTokenURL = "https://api.twitter.com/oauth/request_token"
   o.OwnerAuthURL = "https://api.twitter.com/oauth/authorize"
   o.AccessTokenURL = "https://api.twitter.com/oauth/access_token"
