@@ -4,6 +4,6 @@
   "OAuth": {
     "Key": "5JrkTXyKetbRLm1OSxH5zQ",
     "Secret": "Ub5D23eYnMX7FDwrFBAMtJa0Z4BnflTwA5kqJL5xY",
-    "Callback": "http://chatwit.herokuapp.com"
+    "Callback": "http://ec2-50-17-116-197.compute-1.amazonaws.com"
   }
 }
