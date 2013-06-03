@@ -31,7 +31,7 @@ func NewServer(c *ConfigServer) *Server {
 
   s.tmpl = make(map[string]*template.Template)
   s.tmpl["index"] = NewTemplate("views/index.html", "views/layout.html")
-  s.tmpl["chat"] = NewTemplate("views/chat.html", "views/layout.html")
+  s.tmpl["room"] = NewTemplate("views/room.html", "views/layout.html")
 
   s.hub = NewHub(&s)
 
@@ -49,7 +49,7 @@ func (s *Server) Run(host string) {
   router.HandleFunc("/logout", s.logoutHandler).Methods("GET")
   router.HandleFunc("/auth/twitter", s.twitterAuthHandler).Methods("GET")
   router.HandleFunc("/auth/twitter/callback", s.twitterAuthCallbackHandler).Methods("GET")
-  router.HandleFunc("/chat/{id:[A-Za-z0-9]+}", s.chatHandler).Methods("GET")
+  router.HandleFunc("/room/{id:[A-Za-z0-9]+}", s.roomHandler).Methods("GET")
   router.Handle("/ws/{id:[A-Za-z0-9]+}", websocket.Handler(s.wsHandler))
   // this is no longer needed because we are using asset pipeline
   //router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
@@ -76,7 +76,7 @@ func (s *Server) GetSession(req *http.Request, value string) string {
 
 // Handlers
 
-type chatData struct {
+type roomData struct {
   Host   string
   RoomId string
 }
@@ -85,13 +85,13 @@ func (s *Server) homeHandler(c http.ResponseWriter, req *http.Request) {
   if nickname := s.GetSession(req, "user"); nickname == "" {
     s.tmpl["index"].ExecuteTemplate(c, "layout", req.Host)
   } else {
-    // TODO: serve a dashboard-like page with connected friends and/or available chat rooms
+    // TODO: serve a dashboard-like page with connected friends and/or available room rooms
     // based on friends and/or trending topics
-    http.Redirect(c, req, ("/chat/" + nickname), 302)
+    http.Redirect(c, req, ("/room/" + nickname), 302)
   }
 }
 
-func (s *Server) chatHandler(c http.ResponseWriter, req *http.Request) {
+func (s *Server) roomHandler(c http.ResponseWriter, req *http.Request) {
   session, _ := s.cookies.Get(req, "session")
 
   if session.Values["user"] == nil {
@@ -101,7 +101,7 @@ func (s *Server) chatHandler(c http.ResponseWriter, req *http.Request) {
   params := mux.Vars(req)
   roomId := params["id"]
 
-  s.tmpl["chat"].ExecuteTemplate(c, "layout", &chatData{Host: req.Host, RoomId: roomId})
+  s.tmpl["room"].ExecuteTemplate(c, "layout", &roomData{Host: req.Host, RoomId: roomId})
 }
 
 func (s *Server) notFound(c http.ResponseWriter, req *http.Request) {

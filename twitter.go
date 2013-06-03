@@ -56,5 +56,5 @@ func (s *Server) twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Req
   session.Values["user"] = s.oauth.UserName()
   session.Save(req, c)
 
-  http.Redirect(c, req, ("/chat/" + s.oauth.UserName()), 302)
+  http.Redirect(c, req, ("/room/" + s.oauth.UserName()), 302)
 }
