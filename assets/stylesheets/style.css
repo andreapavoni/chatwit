@@ -55,6 +55,10 @@ span#room-name {
   color: #999;
 }
 
+#home-main {
+  margin-top: 3em;
+}
+
 footer p#footnote {
   font-size: 0.8em;
 }

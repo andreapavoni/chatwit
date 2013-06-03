@@ -65,19 +65,14 @@ $(function() {
     conn = new WebSocket(form.data("socket"));
 
     conn.onclose = function(evt) {
-      appendLog($("<div><b>*** Connection closed. ***</b></div>"))
+      appendLog($("<div class='row'><div class='large-12 columns msg'> <p><strong><span class='timestamp'>" + timestamp() + "</span></strong>   <strong>*** CONNECTION CLOSED ***</strong></p> </div></div>"));
     }
 
     conn.onmessage = function(evt) {
-      console.log(evt.data);
-
       o = jQuery.parseJSON(evt.data)
-      console.log(o["Event"]);
-      console.log(o.Event);
-
       formatMsg(o);
     }
   } else {
-    appendLog($("<div><b>*** Your browser does not support WebSockets. ***</b></div>"))
+    appendLog($("<div class='row'><div class='large-12 columns msg'><p><strong>*** Your browser doesn't support WebSockets. ***</strong></p> </div></div>"));
   }
 });

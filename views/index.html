@@ -1,9 +1,25 @@
 {{define "head"}}
-  <title>Chat Example</title>
+  <title>ChaTwit: Real time conversations with Twitter users</title>
   {{stylesheet_tag "style"}}
 {{end}}
 
 {{define "body"}}
-  <h1>Welcome to ChaTwit</h1>
-  <a href="/auth/twitter">Connect with Twitter</a>
+<div class="row" id="home-main">
+  <div class="large-12 columns panel">
+    <h1>ChaTwit</h1>
+    <p>
+    Do real time conversation with Twitter users. Before start, please keeep in mind the following things:
+
+    <ul>
+      <li>We don't store your conversations: data lives until you stay in the room.</li>
+      <li>It's still under heavy development (don't expect a complete bug-free app).</li>
+      <li>We don't even store your Twitter token.</li>
+      <li>Contact <a href="https://twitter.com/apeacox" target="_blank">@apeacox</a> for feedbacks and suggestions.</li>
+    </ul>
+
+    </p>
+    <a class="button" href="/auth/twitter">Connect with Twitter</a>
+  </div>
+</div>
+
 {{end}}
