@@ -65,15 +65,23 @@ func (h *Hub) joinRoom(c *Client) {
   room.clients[c] = true
   h.rooms[c.room] = room
 
-  join := JoinCommand{Nickname: c.nickname}
-  h.statusMessage(&Command{Event: JOIN, Arguments: join, client: c})
+	stats := RoomStats{UsersCount: len(h.rooms[c.room].clients)}
+	join := JoinCommand{Nickname: c.nickname, Stats: &stats}
+	cmd := Command{Event: JOIN, Arguments: join, client: c}
+
+	// notify room users
+	h.statusMessage(&cmd)
+
+	// notify joined user
+	c.out <- &cmd
 }
 
 func (h *Hub) leaveRoom(c *Client) {
-  part := PartCommand{Nickname: c.nickname}
   room := h.rooms[c.room]
+	stats := (RoomStats{UsersCount: (len(h.rooms[c.room].clients) - 1)})
+	part := PartCommand{Nickname: c.nickname, Stats: &stats}
 
-  h.statusMessage(&Command{Event: PART, Arguments: part, client: c})
+	h.statusMessage(&Command{Event: PART, Arguments: part, client: c})
 
   delete(room.clients, c)
   close(c.out)

@@ -31,15 +31,20 @@ $(function() {
         text = " <strong>" + nickname + ":</strong> " + data.Arguments.Body;
         break;
       case 1:
-        text = " <strong>*** " + nickname + " has left ***</strong> ";
+        text = " <strong>*** " + nickname + " has joined ***</strong> ";
+				updateStats(data.Arguments.Stats);
         break;
       case 2:
-        text = " <strong>*** " + nickname + " has joined ***</strong> ";
+        text = " <strong>*** " + nickname + " has left ***</strong> ";
+				updateStats(data.Arguments.Stats);
         break;
     }
-
     appendLog($("<div class='row'><div class='large-12 columns msg'> <p><strong><span class='timestamp'>" + timestamp() + "</span></strong>" + text + "</p> </div></div>"));
   }
+
+	function updateStats(stats) {
+		$("#room-stats").text(stats.UsersCount);
+	}
 
   msg.on('keyup', function(e) {
     e = e || event;

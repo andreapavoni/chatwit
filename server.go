@@ -74,7 +74,11 @@ func (s *Server) GetSession(req *http.Request, value string) string {
   return ""
 }
 
-// Handlers
+// Handlers and utilities
+
+type RoomStats struct {
+	UsersCount int
+}
 
 type roomData struct {
   Host   string
@@ -101,7 +105,12 @@ func (s *Server) roomHandler(c http.ResponseWriter, req *http.Request) {
   params := mux.Vars(req)
   roomId := params["id"]
 
-  s.tmpl["room"].ExecuteTemplate(c, "layout", &roomData{Host: req.Host, RoomId: roomId})
+	data := roomData{
+		Host: req.Host,
+		RoomId: roomId,
+	}
+
+  s.tmpl["room"].ExecuteTemplate(c, "layout", data)
 }
 
 func (s *Server) notFound(c http.ResponseWriter, req *http.Request) {

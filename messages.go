@@ -20,8 +20,10 @@ type MsgCommand struct {
 
 type PartCommand struct {
   Nickname string
+	Stats *RoomStats
 }
 
 type JoinCommand struct {
   Nickname string
+	Stats *RoomStats
 }
