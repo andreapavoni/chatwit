@@ -1,7 +1,12 @@
+//= require javascripts/foundation.min
+
 $(function() {
+  $(document).foundation();
+
   var conn;
   var msg = $("#msg");
   var log = $("#log");
+  var form = $("#form");
 
   function appendLog(msg) {
     var d = log[0]
@@ -18,20 +23,33 @@ $(function() {
   }
 
   function formatMsg(data) {
+    var nickname = data.Arguments.Nickname;
+    var text;
+
     switch(data.Event) {
       case 0:
-        appendLog($("<div><b>[" + timestamp() + "] " + data.Arguments.Nickname + ":</b> " + data.Arguments.Body + "</div>"));
+        text = " <strong>" + nickname + ":</strong> " + data.Arguments.Body;
         break;
       case 1:
-        appendLog($("<div><b>[" + timestamp() + "] " + "*** " + data.Arguments.Nickname + " has joined ***</b></div>"));
+        text = " <strong>*** " + nickname + " has left ***</strong> ";
         break;
       case 2:
-        appendLog($("<div><b>[" + timestamp() + "] " + "*** " + data.Arguments.Nickname + " has left ***</b></div>"));
+        text = " <strong>*** " + nickname + " has joined ***</strong> ";
         break;
     }
+
+    appendLog($("<div class='row'><div class='large-12 columns msg'> <p><strong><span class='timestamp'>" + timestamp() + "</span></strong>" + text + "</p> </div></div>"));
   }
 
-  $("#form").submit(function() {
+  msg.on('keyup', function(e) {
+    e = e || event;
+    if (e.keyCode === 13 && !e.shiftKey) {
+      form.submit();
+    }
+    return true;
+  });
+
+  form.submit(function() {
     if (!conn) {
       return false;
     }
@@ -44,7 +62,7 @@ $(function() {
   });
 
   if (window["WebSocket"]) {
-    conn = new WebSocket($("#form").data("socket"));
+    conn = new WebSocket(form.data("socket"));
 
     conn.onclose = function(evt) {
       appendLog($("<div><b>*** Connection closed. ***</b></div>"))

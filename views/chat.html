@@ -1,15 +1,70 @@
 {{define "head"}}
-  <title>Chat Example</title>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
-  {{javascript_tag "app"}}
-  {{stylesheet_tag "style"}}
+  <title>{{$.RoomId}} - ChaTwit</title>
 {{end}}
 
 {{define "body"}}
-  <div id="log"></div>
-  <form id="form" data-socket="ws://{{$.Host}}/ws/{{$.RoomId}}">
-    <input type="submit" value="Send" />
-    <input type="text" id="msg" size="64"/>
-  </form>
+<!-- Header and Nav -->
+<header class="row">
+  <nav class="top-bar" id="head-menu">
+    <ul class="title-area">
+      <li class="name">
+      <h1><a href="/">ChaTwit </a></h1>
+      </li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <!-- <li><a href="/dashboard">Main Item 1</a></li>-->
+      </ul>
+      <ul class="right">
+        <li class="last-menu"><a href="/logout">Logout</a></li>
+      </ul>
+    </section>
+  </nav>
+</header>
+<!-- -->
+<div class="row">
+  <div class="large-12 columns" id="room-title">
+    <h3>Room: <span id="room-name">{{$.RoomId}}</span></h3>
+  </div>
+</div>
+
+
+  <div class="row">
+    <div class="large-12 columns" id="log">
+    </div>
+    <div class="row">
+      <form class="large-12 columns" id="form" data-socket="ws://{{$.Host}}/ws/{{$.RoomId}}">
+        <textarea id="msg" size="140" placeholder="Type here..." autofocus="autofocus"></textarea>
+        <small class="help">Use Shit+Enter to go to next line.</small>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="row">
+    <div class="large-12 columns">
+      <hr />
+      <div class="row">
+        <div class="large-5 columns">
+          <p id="footnote">handcrafted with ❤ by <a href="http://andreapavoni.com" target="_blank">Andrea Pavoni</a> &copy; 2013</p>
+        </div>
+        <!--
+        <div class="large-7 columns">
+          <ul class="inline-list right">
+            <li><a href="#">Section 1</a></li>
+            <li><a href="#">Section 2</a></li>
+            <li><a href="#">Section 3</a></li>
+            <li><a href="#">Section 4</a></li>
+            <li><a href="#">Section 5</a></li>
+            <li><a href="#">Section 6</a></li>
+          </ul>
+        </div>
+        -->
+      </div>
+    </div>
+  </footer>
+
 {{end}}
+
 

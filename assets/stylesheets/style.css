@@ -1,34 +1,60 @@
-html {
-  overflow: hidden;
+/*
+ *= require stylesheets/foundation.min
+ */
+
+#head-menu {
+  background: #14151b;
+  margin-bottom: 0.5em;
+
+  border-bottom-right-radius: 0.5em;
+  border-bottom-left-radius: 0.5em;
 }
 
-body {
-  overflow: hidden;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  background: gray;
+#head-menu ul li,  #head-menu ul li > a, #head-menu section ul {
+  background: #14151b;
+  border-bottom-right-radius: 0.5em;
+  border-bottom-left-radius: 0.5em;
+}
+
+div#room-title {
+  padding-left: 0;
+}
+
+span#room-name {
+  color: #4d526a;
+  text-transform: italic;
 }
 
 #log {
-  background: white;
-  margin: 0;
-  padding: 0.5em 0.5em 0.5em 0.5em;
-  position: absolute;
-  top: 0.5em;
-  left: 0.5em;
-  right: 0.5em;
-  bottom: 3em;
-  overflow: auto;
+  margin-bottom: 0.7em;
+  box-shadow: 1px 0px 5px 1px #ccd;
+  height: 30em;
+  overflow-y: scroll;
 }
 
-#form {
-  padding: 0 0.5em 0 0.5em;
-  margin: 0;
-  position: absolute;
-  bottom: 1em;
-  left: 0px;
-  width: 100%;
-  overflow: hidden;
+.msg {
+  padding-left: 0.3em;
+}
+
+.msg span.timestamp {
+  font-size: 80%;
+  color: #999;
+}
+
+.msg p {
+  margin-bottom: 0.3em;
+  padding: 0;
+  line-height: 1em;
+}
+
+#form textarea#msg {
+  margin-bottom: 0;
+}
+
+#form small.help {
+  color: #999;
+}
+
+footer p#footnote {
+  font-size: 0.8em;
 }
