@@ -99,7 +99,7 @@ func (s *Server) roomHandler(c http.ResponseWriter, req *http.Request) {
   session, _ := s.cookies.Get(req, "session")
 
   if session.Values["user"] == nil {
-    http.Redirect(c, req, "/", 403)
+    http.Redirect(c, req, "/", 302)
   }
 
   params := mux.Vars(req)

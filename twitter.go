@@ -22,12 +22,14 @@ func (s *Server) twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
   err := s.oauth.GetRequestToken()
   if err != nil {
     log.Println(err)
+    http.Redirect(c, req, url, 302)
     return
   }
 
   url, err := s.oauth.AuthorizationURL()
   if err != nil {
     log.Println(err)
+    http.Redirect(c, req, url, 302)
     return
   }
 
@@ -49,7 +51,7 @@ func (s *Server) twitterAuthCallbackHandler(c http.ResponseWriter, req *http.Req
 
   if err := s.oauth.GetAccessToken(token); err != nil {
     log.Println(err)
-    http.Redirect(c, req, "/", 403)
+    http.Redirect(c, req, "/", 302)
     return
   }
 
