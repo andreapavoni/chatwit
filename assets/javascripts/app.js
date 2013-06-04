@@ -66,18 +66,20 @@ $(function() {
     return false
   });
 
-  if (window["WebSocket"]) {
-    conn = new WebSocket(form.data("socket"));
+  if (form.lenght > 0) {
+    if (window["WebSocket"]) {
+      conn = new WebSocket(form.data("socket"));
 
-    conn.onclose = function(evt) {
-      appendLog($("<div class='row'><div class='large-12 columns msg'> <p><strong><span class='timestamp'>" + timestamp() + "</span></strong>   <strong>*** CONNECTION CLOSED ***</strong></p> </div></div>"));
-    }
+      conn.onclose = function(evt) {
+        appendLog($("<div class='row'><div class='large-12 columns msg'> <p><strong><span class='timestamp'>" + timestamp() + "</span></strong>   <strong>*** CONNECTION CLOSED ***</strong></p> </div></div>"));
+      }
 
-    conn.onmessage = function(evt) {
-      o = jQuery.parseJSON(evt.data)
-      formatMsg(o);
+      conn.onmessage = function(evt) {
+        o = jQuery.parseJSON(evt.data)
+        formatMsg(o);
+      }
+    } else {
+      appendLog($("<div class='row'><div class='large-12 columns msg'><p><strong>*** Your browser doesn't support WebSockets. ***</strong></p> </div></div>"));
     }
-  } else {
-    appendLog($("<div class='row'><div class='large-12 columns msg'><p><strong>*** Your browser doesn't support WebSockets. ***</strong></p> </div></div>"));
   }
 });
