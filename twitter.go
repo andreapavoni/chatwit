@@ -19,6 +19,12 @@ func NewTwitterOAuth(key, secret, callback string) *oauth.OAuth {
 }
 
 func (s *Server) twitterAuthHandler(c http.ResponseWriter, req *http.Request) {
+  session, _ := s.cookies.Get(req, "session")
+
+  if session.Values["user"] != nil {
+    http.Redirect(c, req, ("/room/" + nickname), 302)
+  }
+
   err := s.oauth.GetRequestToken()
   if err != nil {
     log.Println(err)
