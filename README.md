@@ -22,7 +22,7 @@ Do realtime chat with your twitter friends. This is a simple experimenti with Go
 
 ```make assets-bundle```
 
-# Todo
+## Todo
 
 * Add tests
 * Add better logging
