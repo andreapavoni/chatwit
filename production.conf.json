@@ -2,8 +2,8 @@
   "Address": "10.245.207.25",
   "SessionSecret": "foobarsecret",
   "OAuth": {
-    "Key": "5JrkTXyKetbRLm1OSxH5zQ",
-    "Secret": "Ub5D23eYnMX7FDwrFBAMtJa0Z4BnflTwA5kqJL5xY",
-    "Callback": "http://ec2-50-17-116-197.compute-1.amazonaws.com"
+    "Key": "",
+    "Secret": "",
+    "Callback": ""
   }
 }

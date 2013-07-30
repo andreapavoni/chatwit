@@ -1,6 +1,6 @@
 # ChaTwit
 
-Do realtime chat with your twitter friends.
+Do realtime chat with your twitter friends. This is a simple experimenti with Go and websockets, it's not intended for production!
 
 ## Setup
 
@@ -24,9 +24,9 @@ Do realtime chat with your twitter friends.
 
 # Todo
 
+* Add tests
 * Add better logging
-* be paranoid with ongoing errors
-* check if session is already running when logged out
-* redirect to somewhere when trying to login with twitter but user is already
+* Be paranoid with ongoing errors
+* Check if session is already running when logged out
+* Redirect to somewhere when trying to login with twitter but user is already
   logged in
-* Show current user names (a modal or a sidebar)
